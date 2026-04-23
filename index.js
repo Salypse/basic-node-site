@@ -1,28 +1,25 @@
-const http = require("http");
-const fs = require("fs");
+const express = require("express");
+const app = express();
 
-function getFileData(url) {
-   const file = "./pages" + (url == "/" ? "/index.html" : url + ".html");
-   try {
-      return fs.readFileSync(file, "utf8");
-   } catch (err) {
-      if (err.code == "ENOENT") {
-         throw new Error("File not found");
-      }
-   }
-}
-
-const server = http.createServer((req, res) => {
-   try {
-      var data = getFileData(req.url);
-      res.writeHead(200, { "content-type": "text/html" });
-   } catch (err) {
-      res.writeHead(404, { "content-type": "text/html" });
-      if ((err = "File not found")) {
-         var data = getFileData("/404");
-      }
-   }
-   res.end(data);
+app.get("/", (req, res) => {
+   res.sendFile(process.env.ROOT + "/index.html");
 });
 
-server.listen(8080);
+app.get("/about", (req, res) => res.sendFile(process.env.ROOT + "/about.html"));
+
+app.get("/contact-me", (req, res) =>
+   res.sendFile(process.env.ROOT + "/contact-me.html"),
+);
+
+app.use((req, res) => {
+   if ((res.status = 404)) {
+      res.sendFile(process.env.ROOT + "/404.html");
+   }
+});
+
+const PORT = 3000;
+app.listen(PORT, (error) => {
+   if (error) {
+      console.error(error);
+   }
+});
